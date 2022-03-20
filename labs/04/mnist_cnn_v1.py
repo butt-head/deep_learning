@@ -142,9 +142,6 @@ class Model(tf.keras.Model):
                 inputs_R = outputs
                 layers_res, parameters_res = get_layers_parameters(parameters[i][ parameters[i].index("[")+1 : parameters[i].index("]") ] )
         
-                print(parameters[i][ parameters[i].index("[")+1 : parameters[i].index("]") ] )
-                print(layers_res)
-                print(parameters_res)
                 for i, layer_res in enumerate(layers_res):
                     if layer_res == 'C':   # convolution
                         outputs = convolution(outputs, parameters_res[i])
