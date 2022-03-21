@@ -1,0 +1,1 @@
+bs=256,c=CB-64-3-2-same,M-2-1,CB-128-3-2-same,M-2-1,R-[CB-64-3-1-same,CB-128-3-1-same],CB-256-3-2-same,M-2-1,F,H-4096,H-4096,ds=100,e=150,lr=0.01,lrf=0.001,l=logs/notebook-2022-03-21_124054,m=0.9,o=SGD,s=42,t=4
