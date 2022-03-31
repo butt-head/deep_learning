@@ -1,5 +1,5 @@
 # deep_learning
-My solutions of labs for deep learning course taken at Charles university.
+My solutions of labs for deep learning course taken at Charles University.
 
 For more info, see:
 
