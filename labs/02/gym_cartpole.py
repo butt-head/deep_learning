@@ -99,9 +99,6 @@ def main(args: argparse.Namespace) -> Optional[tf.keras.Model]:
             ])
         model.summary()
 
-        # print("labels:", labels)
-        # print("labels:", len(np.unique(labels)))
-
         # TODO: Prepare the model for training using the `model.compile` method.
         model.compile(
             optimizer=tf.optimizers.Adam(),
