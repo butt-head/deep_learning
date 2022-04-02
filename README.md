@@ -13,8 +13,8 @@ https://github.com/ufal/npfl114
 
 <ul>
   <li>  
-    <figure>
-      <figcaption>Gym cartpole balancing  </figcaption>
+    <figure>  
+      <figcaption>Gym cartpole balancing (<a href="https://github.com/butt-head/deep_learning/blob/main/labs/02/gym_cartpole.py">gym_cartpole</a>)  </figcaption>
      <p>
      <a href="https://github.com/butt-head/deep_learning/blob/main/labs/02/gym_cartpole_balancing.gif">
         <img src="https://user-images.githubusercontent.com/23295940/161395837-45046359-605c-4d7b-a112-42596d78f983.png" width="400" height="400" />
