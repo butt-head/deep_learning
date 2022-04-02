@@ -11,11 +11,11 @@ https://github.com/ufal/npfl114
  <h3>Examples of tasks solved</h3>
  
  <figure>
-  <figcaption>Gym cartpole balancing (<a href="https://github.com/butt-head/deep_learning/tree/main/labs/05/cags_classification">cags_classification</a>) </figcaption>
-</figure>
-![image](https://github.com/butt-head/deep_learning/blob/main/labs/02/gym_cartpole_balancing.gif)
-
-
+   <figcaption>Gym cartpole balancing  </figcaption>
+   <a href="https://github.com/butt-head/deep_learning/blob/main/labs/02/gym_cartpole_balancing.gif">gym_cartpole gif
+     <img src="https://user-images.githubusercontent.com/23295940/161395837-45046359-605c-4d7b-a112-42596d78f983.png" width="400" height="400" />
+   </a>
+ </figure>
  
  
 <figure>
