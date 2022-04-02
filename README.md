@@ -13,7 +13,7 @@ https://github.com/ufal/npfl114
  <figure>
   <figcaption>Gym cartpole balancing (<a href="https://github.com/butt-head/deep_learning/tree/main/labs/05/cags_classification">cags_classification</a>) </figcaption>
 </figure>
-![image](https://user-images.githubusercontent.com/23295940/161395781-4900803d-66a6-4eb8-ad5a-b64c44bfbe31.png)
+![image](https://github.com/butt-head/deep_learning/blob/main/labs/02/gym_cartpole_balancing.gif)
 
 
  
