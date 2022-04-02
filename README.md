@@ -9,4 +9,4 @@ https://github.com/ufal/npfl114
 
 
 
-![image](https://user-images.githubusercontent.com/23295940/161394789-2d91058e-a92f-4367-b6d3-9a661d36aa46.png=400x400)
+![image](https://user-images.githubusercontent.com/23295940/161394789-2d91058e-a92f-4367-b6d3-9a661d36aa46.png =400x400)
