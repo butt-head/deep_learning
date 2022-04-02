@@ -9,6 +9,6 @@ https://github.com/ufal/npfl114
 
 
 <figure>
-  <img src="https://user-images.githubusercontent.com/23295940/161394789-2d91058e-a92f-4367-b6d3-9a661d36aa46.png"/>
   <figcaption>Caption goes here</figcaption>
+  <img src="https://user-images.githubusercontent.com/23295940/161394789-2d91058e-a92f-4367-b6d3-9a661d36aa46.png" width="800" height="800" />
 </figure>
