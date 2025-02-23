@@ -1,0 +1,189 @@
+#!/usr/bin/env python3
+import argparse
+import os
+os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "2")  # Report only TF errors by default
+
+import gym
+import numpy as np
+import tensorflow as tf
+
+import wrappers
+
+parser = argparse.ArgumentParser()
+# These arguments will be set appropriately by ReCodEx, even if you change them.
+parser.add_argument("--recodex", default=False, action="store_true", help="Running in ReCodEx")
+parser.add_argument("--render_each", default=500, type=int, help="Render some episodes.")
+parser.add_argument("--seed", default=42, type=int, help="Random seed.")
+parser.add_argument("--threads", default=0, type=int, help="Maximum number of threads to use.")
+# For these and any other arguments you add, ReCodEx will keep your default value.
+parser.add_argument("--batch_size", default=10, type=int, help="Batch size.")
+parser.add_argument("--episodes", default=500, type=int, help="Training episodes.")
+parser.add_argument("--hidden_layer_size", default=75, type=int, help="Size of hidden layer.")
+parser.add_argument("--hidden_layers", default=1, type=int, help="Size of hidden layer.")
+
+parser.add_argument("--learning_rate", default=0.01, type=float, help="Learning rate.")
+
+
+class Agent:
+    def __init__(self, env: wrappers.EvaluationEnv, args: argparse.Namespace) -> None:
+        # TODO: Create a suitable model. The predict method assumes
+        # it is stored as `self._model`.
+        #
+        # Using Adam optimizer with given `args.learning_rate` is a good default.
+        # raise NotImplementedError()
+        
+        # input
+        inputs = tf.keras.layers.Input(shape=env.observation_space.shape)   # shape=[4]
+
+        # dense layer
+        out = inputs
+        for _ in range(args.hidden_layers):
+            out = tf.keras.layers.Dense(args.hidden_layer_size, activation='relu') (out)
+
+        # output
+        # outputs = tf.keras.layers.Dense(2, activation='softmax') (out)
+        outputs = tf.keras.layers.Dense(1, activation='sigmoid') (out)
+
+        self._optimizer = tf.optimizers.Adam(args.learning_rate) 
+        self._model = tf.keras.Model(inputs=inputs, outputs=outputs)
+
+        # self._inputs = inputs
+        # self._outputs = outputs
+         
+        
+
+    # Define a training method.
+    #
+    # Note that we need to use @tf.function and manual `tf.GradientTape`
+    # for efficiency (using `fit` or `train_on_batch` on extremely small
+    # batches has considerable overhead).
+    #
+    # The `wrappers.typed_np_function` automatically converts input arguments
+    # to NumPy arrays of given type, and converts the result to a NumPy array.
+    @wrappers.typed_np_function(np.float32, np.int32, np.float32)
+    @tf.function(experimental_relax_shapes=True)
+    def train(self, states: np.ndarray, actions: np.ndarray, returns: np.ndarray) -> None:
+        # TODO: Perform training, using the loss from the REINFORCE algorithm.
+        # The easiest approach is to use the `sample_weight` argument of
+        # the `__call__` method of a suitable subclass of `tf.losses.Loss`,
+        # but you can also construct a loss instance with `reduction=tf.losses.Reduction.NONE`
+        # and perform the weighting manually.
+
+        ## ??? states/ inputs???,  actions/outputs ???
+        # nll_loss = tf.keras.losses.CategoricalCrossentropy.__call__(actions, states, sample_weight=returns)  ## sparse??
+        # self._model.compile(optimizer=tf.optimizers.Adam(args.learning_rate), loss=nll_loss)
+        
+        # self._model.compile(optimizer=tf.optimizers.Adam(args.learning_rate), loss=nll_loss(actions, states, sample_weight=returns))
+        # self._model.compile(optimizer=tf.optimizers.Adam(args.learning_rate))
+        with tf.GradientTape() as tape:
+            # nll_loss = tf.keras.losses.SparseCategoricalCrossentropy()  ## sparse
+            loss_function = tf.keras.losses.BinaryCrossentropy() 
+            y_pred = self._model(states)
+            actions = tf.reshape(actions, [-1, 1])
+
+            loss = loss_function(actions, y_pred, sample_weight=returns)
+
+        # trainable_variables = self._model.trainable_variables
+        # gradients = tape.gradient(loss, trainable_variables)
+        # self._optimizer.apply_gradients(zip(gradients, trainable_variables))
+        gradients = tape.gradient(loss, self._model.trainable_variables)
+        self._optimizer.apply_gradients(zip(gradients, self._model.trainable_variables))    
+
+        #self._model.fit(x=states, y=actions)                                                               ## ????
+                                                    
+
+    # Predict method, again with manual @tf.function for efficiency.
+    @wrappers.typed_np_function(np.float32)
+    @tf.function
+    def predict(self, states: np.ndarray) -> np.ndarray:
+        return self._model(states)
+
+
+def main(env: wrappers.EvaluationEnv, args: argparse.Namespace) -> None:
+    # Fix random seeds and threads
+    np.random.seed(args.seed)
+    tf.random.set_seed(args.seed)
+    tf.config.threading.set_inter_op_parallelism_threads(args.threads)
+    tf.config.threading.set_intra_op_parallelism_threads(args.threads)
+
+    # Construct the agent
+    agent = Agent(env, args)
+
+
+    # Training
+    for _ in range(args.episodes // args.batch_size):
+        batch_states, batch_actions, batch_returns = [], [], []
+        for _ in range(args.batch_size):
+            # Perform episode
+            states, actions, rewards = [], [], []
+            state, done = env.reset(), False
+            while not done:
+                if args.render_each and env.episode > 0 and env.episode % args.render_each == 0:
+                    env.render()
+
+                # TODO: Choose `action` according to probabilities
+                # distribution (see `np.random.choice`), which you
+                # can compute using `agent.predict` and current `state`.
+                 # action = np.random.choice([0, 1], p=[prob[0], 1-prob[0]])
+                # prob = agent.predict([state])[0]
+                prob = agent.predict([state])[0][0]
+
+                # action = np.random.choice([0, 1], p=[prob[0], 1-prob[0]])
+                # print(prob, 1-prob)
+                # action = np.random.choice([0, 1], p=[prob, 1-prob])   # a)
+                action = np.random.choice([0, 1], p=[1-prob, prob])   # b)
+                # action = np.random.choice([1, 0], p=[prob, 1-prob])   # c)
+                # action = np.random.choice([1, 0], p=[1-prob, prob])     # d)           
+                # print(action)
+
+                next_state, reward, done, _ = env.step(action)
+
+                states.append(state)
+                actions.append(action)
+                rewards.append(reward)
+
+                state = next_state
+
+            # TODO: Compute returns from the received rewards
+            Gs = []
+            G = 0     # return
+            gamma = 1 # discount factor
+            for state, action, reward in zip(states[::-1], actions[::-1], rewards[::-1]):
+            # for state, action, reward in zip(states, actions, rewards):
+                # Gs.append(G)
+                G = gamma*G + reward
+                Gs.append(G)
+
+            # TODO: Add states, actions and returns to the training batch
+
+            # 
+            batch_states  = batch_states + states
+            batch_actions = batch_actions + actions
+            # batch_returns = batch_returns + [G]
+            batch_returns = batch_returns + Gs[::-1]
+
+        # TODO: Train using the generated batch.
+        agent.train(batch_states, batch_actions, batch_returns)
+        # print("Gs",Gs)
+
+    # Final evaluation
+    while True:
+        state, done = env.reset(start_evaluation=True), False
+        while not done:
+            # TODO: Choose greedy action
+            prob = agent.predict([state])[0][0]
+
+            action =  np.argmax([1-prob, prob])        # a
+            # action =  np.argmax([prob, 1-prob])      # b
+            # action =  np.argmax(agent.predict([state])[0])
+            # action = np.random.choice([0, 1], p=[prob[0], 1-prob[0]])
+            state, reward, done, _ = env.step(action)
+
+
+if __name__ == "__main__":
+    args = parser.parse_args([] if "__file__" not in globals() else None)
+
+    # Create the environment
+    env = wrappers.EvaluationEnv(gym.make("CartPole-v1"), args.seed)
+
+    main(env, args)
